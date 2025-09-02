@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Lock, Eye, EyeOff, Shield, CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { ArrowLeft, Shield, AlertCircle, FileText, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 
@@ -18,8 +18,10 @@ const CreateAccountWithValidation: React.FC = () => {
     const navigate = useNavigate();
     const { signUp } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Fixed: changed to proper state declaration
     const [validatingRef, setValidatingRef] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [application, setApplication] = useState<BusinessApplication | null>(null);
 
     const [referenceData, setReferenceData] = useState({
@@ -33,8 +35,6 @@ const CreateAccountWithValidation: React.FC = () => {
         acceptTerms: false
     });
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleReferenceInputChange = (field: string, value: string) => {
@@ -409,6 +409,140 @@ const CreateAccountWithValidation: React.FC = () => {
                         </div>
                     )}
 
+                    {/* Step 2: Account Creation */}
+                    {currentStep === 2 && application && (
+                        <div>
+                            <div className="text-center mb-6">
+                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Shield className="w-6 h-6 text-green-600" />
+                                </div>
+                                <h2 className="text-lg font-semibold text-gray-900 mb-2">Create Your Account</h2>
+                                <p className="text-sm text-gray-600">
+                                    Welcome back, {application.full_name}! Create your secure password.
+                                </p>
+                            </div>
+
+                            {/* Application Details Summary */}
+                            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                                <h3 className="font-medium text-gray-900 mb-2">Application Details</h3>
+                                <div className="space-y-1 text-sm text-gray-600">
+                                    <p><span className="font-medium">Reference:</span> {application.reference_number}</p>
+                                    <p><span className="font-medium">Business:</span> {application.business_name}</p>
+                                    <p><span className="font-medium">Email:</span> {application.email}</p>
+                                </div>
+                            </div>
+
+                            {/* Global Error Display */}
+                            {errors.general && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                                    <div className="flex items-center space-x-2">
+                                        <AlertCircle className="w-5 h-5 text-red-600" />
+                                        <p className="text-red-800 text-sm">{errors.general}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <form onSubmit={handleAccountCreation} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Password <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={accountData.password}
+                                            onChange={(e) => handleAccountInputChange('password', e.target.value)}
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-10 ${
+                                                errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            }`}
+                                            placeholder="Enter your password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                        >
+                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
+                                    {errors.password && (
+                                        <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+                                    )}
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Must be at least 6 characters long
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Confirm Password <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            value={accountData.confirmPassword}
+                                            onChange={(e) => handleAccountInputChange('confirmPassword', e.target.value)}
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-10 ${
+                                                errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            }`}
+                                            placeholder="Confirm your password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
+                                    {errors.confirmPassword && (
+                                        <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="flex items-start space-x-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={accountData.acceptTerms}
+                                            onChange={(e) => handleAccountInputChange('acceptTerms', e.target.checked)}
+                                            className="mt-1 w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                                        />
+                                        <span className="text-sm text-gray-700">
+                                            I accept the{' '}
+                                            <a href="/terms" className="text-primary-600 hover:text-primary-700">
+                                                Terms and Conditions
+                                            </a>{' '}
+                                            and{' '}
+                                            <a href="/privacy" className="text-primary-600 hover:text-primary-700">
+                                                Privacy Policy
+                                            </a>
+                                        </span>
+                                    </label>
+                                    {errors.acceptTerms && (
+                                        <p className="text-red-600 text-sm mt-1">{errors.acceptTerms}</p>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full py-3 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                                            Creating Account...
+                                        </>
+                                    ) : (
+                                        'Create Account'
+                                    )}
+                                </button>
+                            </form>
+                        </div>
+                    )}
                 </div>
 
                 {/* Help Section */}

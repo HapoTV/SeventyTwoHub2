@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, TrendingUp, Shield, AlertCircle, User, Phone } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, AlertCircle, User, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logoSvg from '../assets/seventytwo-logo.svg';
 import logo from "../assets/SBSA Pic.png";

@@ -9,12 +9,22 @@ type FormDataState = {
   emailAddress: string;
   cellphoneNumber: string;
   businessName: string;
+  cipcRegistrationNo: string;
+  yearEstablished: string;
+  annualTurnover: string;
   cityTownship: string;
   businessResidentialCorridor: string;
   businessIndustry: string;
   businessDescription: string;
+  businessOverview: string;
+  uniqueValueProposition: string;
   consentToShare: boolean;
   declaration: boolean;
+  cipcRegistrationDocument: boolean;
+  validBBEECertificate: boolean;
+  proofOfID: boolean;
+  validTaxClearance: boolean;
+  businessProfile: boolean;
 };
 
 const BusinessInformation: React.FC = () => {
@@ -26,12 +36,22 @@ const BusinessInformation: React.FC = () => {
     emailAddress: '',
     cellphoneNumber: '',
     businessName: '',
+    cipcRegistrationNo: '',
+    yearEstablished: '',
+    annualTurnover: '',
     cityTownship: '',
     businessResidentialCorridor: '',
     businessIndustry: '',
     businessDescription: '',
+    businessOverview: '',
+    uniqueValueProposition: '',
     consentToShare: false,
-    declaration: false
+    declaration: false,
+    cipcRegistrationDocument: false,
+    validBBEECertificate: false,
+    proofOfID: false,
+    validTaxClearance: false,
+    businessProfile: false
   });
 
   const genderOptions = [
@@ -72,6 +92,18 @@ const BusinessInformation: React.FC = () => {
     'Youth-Owned',
     'Black-Owned',
     'Other'
+  ];
+
+  // Generate years from 2025 down to 2015
+  const yearOptions = Array.from({ length: 11 }, (_, i) => 2025 - i);
+
+  const turnoverOptions = [
+    'R0 - R1 Million',
+    'R1 Million - R2 Million',
+    'R2 Million - R3 Million',
+    'R3 Million - R4 Million',
+    'R4 Million - R5 Million',
+    'R5 Million and more'
   ];
 
   const handleInputChange = (field: keyof FormDataState, value: string | boolean) => {
@@ -115,7 +147,7 @@ const BusinessInformation: React.FC = () => {
       <div className="max-w-md mx-auto">
         <div className="flex items-center mb-6">
           <button
-            onClick={() => navigate('/register/account-validated')}
+            onClick={() => navigate('/login')}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -229,6 +261,54 @@ const BusinessInformation: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                CIPC Company Registration No. <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.cipcRegistrationNo}
+                onChange={(e) => handleInputChange('cipcRegistrationNo', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your CIPC registration number"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Year Established <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.yearEstablished}
+                onChange={(e) => handleInputChange('yearEstablished', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              >
+                <option value="">Please Select</option>
+                {yearOptions.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Annual Turnover (Last Financial Year) <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.annualTurnover}
+                onChange={(e) => handleInputChange('annualTurnover', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              >
+                <option value="">Please Select</option>
+                {turnoverOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 City/Township
               </label>
               <div className="relative">
@@ -297,6 +377,34 @@ const BusinessInformation: React.FC = () => {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Describe Your Business: (Provide a brief overview of your products or services and the market you serve) <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={formData.businessOverview}
+                onChange={(e) => handleInputChange('businessOverview', e.target.value)}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                placeholder="Provide a brief overview of your products or services and the market you serve..."
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                What is your unique value proposition? <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={formData.uniqueValueProposition}
+                onChange={(e) => handleInputChange('uniqueValueProposition', e.target.value)}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                placeholder="What makes your business unique? What sets you apart from competitors?"
+                required
+              />
+            </div>
+
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <label className="flex items-start space-x-3">
                 <input
@@ -316,25 +424,95 @@ const BusinessInformation: React.FC = () => {
               </label>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <label className="flex items-start space-x-3">
-                <input
-                  type="checkbox"
-                  checked={formData.declaration}
-                  onChange={(e) => handleInputChange('declaration', e.target.checked)}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                  required
-                />
-                <div>
-                  <span className="text-sm font-medium text-gray-900">
-                    Declaration <span className="text-red-500">*</span>
-                  </span>
-                  <p className="text-xs text-gray-600 mt-1">
-                    I declare that the information provided is true and accurate to the best of my knowledge. 
-                    I understand that providing false information may result in the rejection of my application.
-                  </p>
-                </div>
-              </label>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-4">Disclaimer and Declaration</h3>
+              
+              <div className="mb-4">
+                <label className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.declaration}
+                    onChange={(e) => handleInputChange('declaration', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                    required
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">
+                      Declaration <span className="text-red-500">*</span>
+                    </span>
+                    <p className="text-xs text-gray-600 mt-1">
+                      I declare that the information provided is true and accurate to the best of my knowledge. 
+                      I understand that providing false information may result in the rejection of my application.
+                    </p>
+                  </div>
+                </label>
+              </div>
+              
+              <p className="text-sm text-gray-700 mb-4">
+                I hereby confirm that my business possesses all the following valid and up-to-date 
+                compliance documents. I understand that I must be able to submit these for 
+                verification if my application is shortlisted.
+              </p>
+              
+              <p className="text-sm font-medium text-gray-700 mb-4 italic">
+                Please tick the box next to each document you confirm is valid and up to date:
+              </p>
+
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-gray-900">
+                  Application Documents <span className="text-red-500">*</span>
+                </h4>
+                
+                <label className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.cipcRegistrationDocument}
+                    onChange={(e) => handleInputChange('cipcRegistrationDocument', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                  />
+                  <span className="text-sm text-gray-700">CIPC Registration Document</span>
+                </label>
+
+                <label className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.validBBEECertificate}
+                    onChange={(e) => handleInputChange('validBBEECertificate', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                  />
+                  <span className="text-sm text-gray-700">Valid B-BBEE Certificate/Affidavit</span>
+                </label>
+
+                <label className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.proofOfID}
+                    onChange={(e) => handleInputChange('proofOfID', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                  />
+                  <span className="text-sm text-gray-700">Proof of ID</span>
+                </label>
+
+                <label className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.validTaxClearance}
+                    onChange={(e) => handleInputChange('validTaxClearance', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                  />
+                  <span className="text-sm text-gray-700">Valid Tax Clearance Certificate (Optional)</span>
+                </label>
+
+                <label className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.businessProfile}
+                    onChange={(e) => handleInputChange('businessProfile', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                  />
+                  <span className="text-sm text-gray-700">Business Profile (Optional)</span>
+                </label>
+              </div>
             </div>
 
             <div className="pt-4">

@@ -28,7 +28,6 @@ import WelcomeScreen from '../pages/WelcomeScreen';
 import UnifiedLogin from '../pages/UnifiedLogin';
 import PublicApplicationForm from '../pages/PublicApplicationForm';
 import RegistrationStart from '../pages/registration/RegistrationStart';
-import CreateAccountWithValidation from '../pages/registration/CreateAccountWithValidation';
 import BusinessInformation from '../pages/registration/BusinessInformation';
 import SupportingDocuments from '../pages/registration/SupportingDocuments';
 import ApplicationType from '../pages/registration/ApplicationType';
@@ -66,12 +65,6 @@ export const publicRoutes: RouteConfig[] = [
   {
     path: '/register/start',
     element: RegistrationStart,
-    isPublic: true,
-    layout: 'public'
-  },
-  {
-    path: '/register/account-validated',
-    element: CreateAccountWithValidation,
     isPublic: true,
     layout: 'public'
   },

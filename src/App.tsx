@@ -40,6 +40,7 @@ const PublicApplicationForm = React.lazy(() => import("./pages/PublicApplication
 const CreateAccountWithValidation = React.lazy(() => import("./pages/registration/CreateAccountWithValidation"));
 const BusinessInformation = React.lazy(() => import("./pages/registration/BusinessInformation"));
 const ApplicationType = React.lazy(() => import("./pages/registration/ApplicationType"));
+const DisclaimerAndDeclaration = React.lazy(() => import("./pages/registration/DisclaimerAndDeclaration"));
 const Confirmation = React.lazy(() => import("./pages/registration/Confirmation"));
 
 // Loading component
@@ -114,6 +115,7 @@ function App() {
                 <Route path="/register/account-validated" element={<CreateAccountWithValidation />} />
                 <Route path="/register/business" element={<BusinessInformation />} />
                 <Route path="/register/application-type" element={<ApplicationType />} />
+                <Route path="/register/disclaimer-declaration" element={<DisclaimerAndDeclaration />} />
                 <Route path="/register/confirmation" element={<Confirmation />} />
 
                 {/* Admin Routes */}

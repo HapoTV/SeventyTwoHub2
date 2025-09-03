@@ -112,8 +112,8 @@ const RegistrationStart: React.FC = () => {
           <p className="text-sm text-gray-500 mb-2">Need assistance with your application?</p>
           <p className="text-xs text-gray-500">
             Contact us at{' '}
-            <a href="mailto:support@seventytwo.co.za" className="text-primary-600 hover:text-primary-700">
-              support@seventytwo.co.za
+            <a href="mailto:businesssupport@classicoriental.co.za" className="text-primary-600 hover:text-primary-700">
+              businesssupport@classicoriental.co.za
             </a>
           </p>
         </div>

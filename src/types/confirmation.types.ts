@@ -17,6 +17,7 @@ export interface BusinessRegistrationData {
     beee_level: 'not_certified' | string;
     selected_services: string[];
     description: string;
+    
 }
 
 /**
@@ -69,4 +70,46 @@ export interface FullRegistrationData {
         selectedTypes: string[];
         description: string;
     };
+}
+
+/**
+ * Defines the structure of the confirmation email sent to the user.
+ */
+export interface ConfirmationEmailData {
+    email: string;
+    fullName: string;
+    businessName: string;
+    referenceNumber: string;
+    submittedAt: string; // ✅ now allowed
+}
+
+/**
+ * Defines the structure of the notification email sent to the admin.
+ */
+export interface AdminNotificationData {
+    applicantEmail: string; // ✅ now allowed
+    fullName: string;
+    businessName: string;
+    referenceNumber: string;
+    submittedAt: string;
+    businessType: string;
+    location: string;
+}
+
+export interface ConfirmationEmailData {
+    email: string;
+    fullName: string;
+    businessName: string;
+    referenceNumber: string;
+    submittedAt: string; // ✅ Add this line
+}
+
+export interface AdminNotificationData {
+    applicantEmail: string; // ✅ Add this line
+    fullName: string;
+    businessName: string;
+    referenceNumber: string;
+    submittedAt: string;   // ✅ Add this line
+    businessType: string;
+    location: string;
 }

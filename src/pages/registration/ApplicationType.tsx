@@ -67,6 +67,22 @@ const ApplicationType: React.FC = () => {
     };
   }, [loadAvailablePrograms]);
 
+  // Load saved form data when component mounts
+  useEffect(() => {
+    const savedData = localStorage.getItem('registrationData');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        if (parsedData.step4) {
+          setSelectedPrograms(parsedData.step4.selectedPrograms || []);
+          setDescription(parsedData.step4.description || '');
+        }
+      } catch (error) {
+        console.error('Error loading saved program data:', error);
+      }
+    }
+  }, []);
+
 
   const getIconForProgram = (programName: string) => {
     const name = programName.toLowerCase();
@@ -128,7 +144,7 @@ const ApplicationType: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-2xl mx-auto">
         <div className="flex items-center mb-6">
           <button
               onClick={() => navigate('/register/business')}
@@ -139,7 +155,7 @@ const ApplicationType: React.FC = () => {
             <h1 className="text-xl font-semibold text-gray-900 ml-4">Select Programs</h1>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-blue-50 rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
@@ -298,27 +314,58 @@ const ApplicationType: React.FC = () => {
               <p className="text-xs text-gray-500 mt-1">{description.length}/500 characters</p>
             </div>
 
-            <div className="pt-4">
+            <div className="flex justify-between pt-6">
               <button
-                type="submit"
-                disabled={loading || availablePrograms.length === 0 || selectedPrograms.length === 0}
-                className="w-full py-3 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                type="button"
+                onClick={() => navigate('/register/business')}
+                className="px-6 py-3 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-950 transition-colors"
               >
-                  {selectedPrograms.length > 0 ? `Apply to ${selectedPrograms.length} Program${selectedPrograms.length > 1 ? 's' : ''}` : 'Select Programs to Continue'}
+                Back
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (selectedPrograms.length === 0) {
+                    alert('Please select at least one program to apply for');
+                    return;
+                  }
 
-                {selectedPrograms.length === 0 && !loading && availablePrograms.length > 0 && (
-                    <p className="text-center text-sm text-gray-500 mt-2">Please select at least one program to
-                        continue</p>
-                )}
+                  // Update registration data
+                  const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+                  localStorage.setItem('registrationData', JSON.stringify({
+                    ...existingData,
+                    step4: {
+                      selectedPrograms,
+                      description,
+                      selectedProgramsData: availablePrograms.filter(p => selectedPrograms.includes(p.id))
+                    }
+                  }));
+                  
+                  navigate('/register/disclaimer-declaration');
+                }}
+                disabled={loading || availablePrograms.length === 0 || selectedPrograms.length === 0}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
             </div>
+
+            {selectedPrograms.length === 0 && !loading && availablePrograms.length > 0 && (
+              <p className="text-center text-sm text-gray-500 mt-2">Please select at least one program to continue</p>
+            )}
           </form>
+
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-500">
+              Select programs that align with your business goals
+            </p>
+          </div>
         </div>
 
           <div className="mt-6 text-center">
               <p className="text-sm text-gray-500 mb-2">Need help choosing programs?</p>
-              <p className="text-xs text-gray-500">Contact us at <a href="mailto:support@seventytwo.co.za"
-                                                                    className="text-primary-600 hover:text-primary-700">support@seventytwo.co.za</a>
+              <p className="text-xs text-gray-500">Contact us at <a href="mailto:businesssupport@classicoriental.co.za"
+                                                                    className="text-primary-600 hover:text-primary-700">businesssupport@classicoriental.co.za</a>
               </p>
           </div>
       </div>

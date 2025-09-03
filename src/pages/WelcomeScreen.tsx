@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/SBSA Pic.png';
 import newBackground from '../assets/1-cc9e8162.png';
@@ -8,6 +8,16 @@ import gptLogo from '../assets/Gauteng Gov.png';
 
 const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [showError, setShowError] = useState(false);
+
+  const handleRegisterClick = () => {
+    if (!privacyAccepted) {
+      setShowError(true);
+      return;
+    }
+    navigate('/register/business');
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -114,23 +124,54 @@ const WelcomeScreen: React.FC = () => {
               </ul>
             </div>
 
-            {/* Required Documents */}
-            <div>
-              <h3 className="font-semibold text-sm sm:text-base">Required Documents</h3>
-              <ul className="space-y-1 ml-4 list-disc text-xs sm:text-sm text-gray-700">
-                <li>CIPC Registration Documents</li>
-                <li>Valid B-BBEE Certificate / Affidavit</li>
-                <li>Certified Proof of ID</li>
-                <li>Valid Tax Clearance Certificate (Optional)</li>
-                <li>Business Profile (Optional)</li>
-              </ul>
+          </div>
+
+          {/* Privacy Terms */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p className="text-xs sm:text-sm leading-relaxed text-gray-700 mb-3">
+              By registering for the development programme you acknowledge that your personal information will 
+              be processed by us according to our privacy statement which is in line with applicable laws on 
+              protecting and processing personal information.
+            </p>
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="privacy-terms"
+                checked={privacyAccepted}
+                onChange={(e) => {
+                  setPrivacyAccepted(e.target.checked);
+                  if (e.target.checked) {
+                    setShowError(false);
+                  }
+                }}
+                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="privacy-terms" className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                I have read and understood the above and accept the terms of your{' '}
+                <a
+                  href="https://www.standardbank.co.za/southafrica/personal/about-us/legal/privacy-statement"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline font-medium"
+                >
+                  Privacy Statement
+                </a>
+                . <span className="text-red-500">*</span>
+              </label>
             </div>
+            {showError && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-600 text-xs sm:text-sm font-medium">
+                  ⚠️ You must accept the Privacy Statement terms to proceed with registration.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* CTA Buttons */}
           <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4">
             <button
-              onClick={() => navigate('/register/business')}
+              onClick={handleRegisterClick}
               className="bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-lg transition font-medium shadow-sm"
             >
               Register My Business

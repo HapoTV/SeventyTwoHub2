@@ -9,6 +9,7 @@ interface ConfirmationEmailData {
   businessName: string;
   referenceNumber: string;
   submissionDate: string;
+  
 }
 
 interface AdminNotificationData {
@@ -17,6 +18,8 @@ interface AdminNotificationData {
   businessName: string;
   referenceNumber: string;
   submissionDate: string;
+  businessType: string;
+  location: string;
 }
 
 /**

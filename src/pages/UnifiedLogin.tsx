@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, TrendingUp, Shield, AlertCircle, User, Phone } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, AlertCircle, User, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logoSvg from '../assets/seventytwo-logo.svg';
 import logo from "../assets/SBSA Pic.png";
@@ -685,7 +685,7 @@ const UnifiedLogin: React.FC = () => {
                 Business Registration
               </button>
               <button
-                onClick={() => window.open('mailto:support@seventytwo.co.za')}
+                onClick={() => window.open('mailto:businesssupport@classicoriental.co.za')}
                 className="bg-transparent hover:bg-white/10 text-white px-5 py-2 rounded-md text-sm font-semibold transition-colors border border-white/30"
               >
                 Contact Support

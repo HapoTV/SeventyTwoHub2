@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Copy, Mail } from 'lucide-react';
 import {finalizeRegistration} from '../../lib/confirmation.queries';
 import { sendConfirmationEmail, sendAdminNotification } from '../../lib/emailService';
-import type {FullRegistrationData} from '../../types/confirmation.types';
+import type {FullRegistrationData } from '../../types/confirmation.types';
+
 
 const Confirmation: React.FC = () => {
   const navigate = useNavigate();
@@ -74,19 +75,19 @@ const Confirmation: React.FC = () => {
             fullName: fullName,
             businessName: regData.step2.businessName,
             referenceNumber: result.reference_number,
-            submittedAt: result.submitted_at
+            submissionDate: result.submitted_at
           });
           setEmailSent(true);
           console.log('User confirmation email sent successfully');
           
           // Send admin notification email
           await sendAdminNotification({
-            applicantEmail: userEmailAddr,
+            email: userEmailAddr,
             fullName: fullName,
             businessName: regData.step2.businessName,
             referenceNumber: result.reference_number,
-            submittedAt: result.submitted_at,
-            businessType: regData.step2.businessType,
+            submissionDate: result.submitted_at,
+            businessType: regData.step2.businessType ?? '',
             location: regData.step2.cityTownship
           });
           console.log('Admin notification email sent successfully');
@@ -131,7 +132,7 @@ const Confirmation: React.FC = () => {
         fullName: fullName,
         businessName: registrationData.step2.businessName,
         referenceNumber: applicationNumber,
-        submittedAt: new Date().toISOString()
+        submissionDate: new Date().toISOString()
       });
       
       alert('Confirmation email resent successfully!');
@@ -218,8 +219,8 @@ const Confirmation: React.FC = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
             Need help? Contact us at{' '}
-              <a href="mailto:Phelokazi@hapogroup.co.za" className="text-primary-600 hover:text-primary-700">
-                  Phelokazi@hapogroup.co.za
+              <a href="mailto:businesssupport@classicoriental.co.za" className="text-primary-600 hover:text-primary-700">
+                  businesssupport@classicoriental.co.za
             </a>
           </p>
         </div>

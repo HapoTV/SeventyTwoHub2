@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Building, MapPin, User, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Building, MapPin } from 'lucide-react';
 
 type FormDataState = {
   firstName: string;
@@ -10,15 +10,16 @@ type FormDataState = {
   cellphoneNumber: string;
   businessName: string;
   cipcRegistrationNo: string;
-  yearEstablished: string;
-  annualTurnover: string;
   cityTownship: string;
   businessResidentialCorridor: string;
-  businessIndustry: string;
-  businessDescription: string;
+  businessIndustry: string[];
+  otherBusinessIndustry: string;
+  bbbeeLevel: string;
+  yearEstablished: string;
+  annualTurnover: string;
+  businessDescription: string[];
   businessOverview: string;
   uniqueValueProposition: string;
-  consentToShare: boolean;
   declaration: boolean;
   cipcRegistrationDocument: boolean;
   validBBEECertificate: boolean;
@@ -37,15 +38,16 @@ const BusinessInformation: React.FC = () => {
     cellphoneNumber: '',
     businessName: '',
     cipcRegistrationNo: '',
-    yearEstablished: '',
-    annualTurnover: '',
     cityTownship: '',
     businessResidentialCorridor: '',
-    businessIndustry: '',
-    businessDescription: '',
+    businessIndustry: [],
+    otherBusinessIndustry: '',
+    bbbeeLevel: '',
+    yearEstablished: '',
+    annualTurnover: '',
+    businessDescription: [],
     businessOverview: '',
     uniqueValueProposition: '',
-    consentToShare: false,
     declaration: false,
     cipcRegistrationDocument: false,
     validBBEECertificate: false,
@@ -53,6 +55,21 @@ const BusinessInformation: React.FC = () => {
     validTaxClearance: false,
     businessProfile: false
   });
+
+  // Load saved form data when component mounts
+  useEffect(() => {
+    const savedData = localStorage.getItem('registrationData');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        if (parsedData.step2) {
+          setFormData(parsedData.step2);
+        }
+      } catch (error) {
+        console.error('Error loading saved form data:', error);
+      }
+    }
+  }, []);
 
   const genderOptions = [
     'Male',
@@ -94,8 +111,8 @@ const BusinessInformation: React.FC = () => {
     'Other'
   ];
 
-  // Generate years from 2025 down to 2015
-  const yearOptions = Array.from({ length: 11 }, (_, i) => 2025 - i);
+  // Generate years from 2025 down to 2020
+  const yearOptions = Array.from({ length: 6 }, (_, i) => 2025 - i);
 
   const turnoverOptions = [
     'R0 - R1 Million',
@@ -106,45 +123,41 @@ const BusinessInformation: React.FC = () => {
     'R5 Million and more'
   ];
 
-  const handleInputChange = (field: keyof FormDataState, value: string | boolean) => {
+  const bbbeeOptions = [
+    'Please Select',
+    'BBBEE Level 1 (135% B-BBEE procurement recognition level)',
+    'BBBEE Level 2 (125% B-BBEE procurement recognition level)',
+    'BBBEE Level 3 (110% B-BBEE procurement recognition level)',
+    'BBBEE Level 4 (100% B-BBEE procurement recognition level)',
+    'BBBEE Level 5 (80% B-BBEE procurement recognition level)'
+  ];
+
+  const handleInputChange = (field: keyof FormDataState, value: string | boolean | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate required fields
-    const requiredFields: (keyof FormDataState)[] = [
-      'firstName', 'lastName', 'gender', 'emailAddress', 'cellphoneNumber', 
-      'businessName', 'businessResidentialCorridor'
-    ];
-    
-    const missingFields = requiredFields.filter(field => !formData[field]);
-    
-    if (missingFields.length > 0) {
-      alert('Please fill in all required fields marked with *');
-      return;
-    }
-
-    if (!formData.declaration) {
-      alert('Please accept the declaration to continue');
-      return;
-    }
-
-    // Update registration data
-    const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
-    localStorage.setItem('registrationData', JSON.stringify({
-      ...existingData,
-      step2: formData
+  const handleBusinessIndustryChange = (industry: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      businessIndustry: checked
+        ? [...prev.businessIndustry, industry]
+        : prev.businessIndustry.filter(item => item !== industry)
     }));
-    
-    // Skip documents step and go directly to application type
-    navigate('/register/application-type');
   };
+
+  const handleBusinessDescriptionChange = (description: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      businessDescription: checked
+        ? [...prev.businessDescription, description]
+        : prev.businessDescription.filter(item => item !== description)
+    }));
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-2xl mx-auto">
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate('/login')}
@@ -155,8 +168,8 @@ const BusinessInformation: React.FC = () => {
           <h1 className="text-xl font-semibold text-gray-900 ml-4">Business Information</h1>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <form onSubmit={handleNext} className="space-y-4">
+        <div className="bg-blue-50 rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="space-y-4">
             {/* Personal Information */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -275,6 +288,87 @@ const BusinessInformation: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                City/Township
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.cityTownship}
+                  onChange={(e) => handleInputChange('cityTownship', e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="e.g., Soweto, Pretoria"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Business Residential Corridor <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.businessResidentialCorridor}
+                onChange={(e) => handleInputChange('businessResidentialCorridor', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              >
+                <option value="">Select corridor</option>
+                {corridorOptions.map(corridor => (
+                  <option key={corridor} value={corridor}>{corridor}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Business Industry <span className="text-red-500">*</span>
+              </label>
+              <div className="space-y-2">
+                {industryOptions.map(industry => (
+                  <label key={industry} className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.businessIndustry.includes(industry)}
+                      onChange={(e) => handleBusinessIndustryChange(industry, e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">{industry}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Other Business Industry's (please specify)
+              </label>
+              <textarea
+                value={formData.otherBusinessIndustry}
+                onChange={(e) => handleInputChange('otherBusinessIndustry', e.target.value)}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                placeholder="Please specify any other business industries..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                B-BBEE Level Contributor: <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.bbbeeLevel}
+                onChange={(e) => handleInputChange('bbbeeLevel', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              >
+                {bbbeeOptions.map(level => (
+                  <option key={level} value={level}>{level}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Year Established <span className="text-red-500">*</span>
               </label>
               <select
@@ -309,67 +403,16 @@ const BusinessInformation: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City/Township
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  value={formData.cityTownship}
-                  onChange={(e) => handleInputChange('cityTownship', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="e.g., Soweto, Pretoria"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Business Residential Corridor <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.businessResidentialCorridor}
-                onChange={(e) => handleInputChange('businessResidentialCorridor', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-              >
-                <option value="">Select corridor</option>
-                {corridorOptions.map(corridor => (
-                  <option key={corridor} value={corridor}>{corridor}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Business Industry
-              </label>
-              <select
-                value={formData.businessIndustry}
-                onChange={(e) => handleInputChange('businessIndustry', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="">Select industry</option>
-                {industryOptions.map(industry => (
-                  <option key={industry} value={industry}>{industry}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select the option that best describes your business
+                Select the option that best describes your business: <span className="text-red-500">*</span>
               </label>
               <div className="space-y-2">
                 {businessDescriptionOptions.map(option => (
-                  <label key={option} className="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <label key={option} className="flex items-center space-x-2 cursor-pointer">
                     <input
-                      type="radio"
-                      name="businessDescription"
-                      value={option}
-                      checked={formData.businessDescription === option}
-                      onChange={(e) => handleInputChange('businessDescription', e.target.value)}
-                      className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500"
+                      type="checkbox"
+                      checked={formData.businessDescription.includes(option)}
+                      onChange={(e) => handleBusinessDescriptionChange(option, e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-700">{option}</span>
                   </label>
@@ -405,125 +448,70 @@ const BusinessInformation: React.FC = () => {
               />
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <label className="flex items-start space-x-3">
-                <input
-                  type="checkbox"
-                  checked={formData.consentToShare}
-                  onChange={(e) => handleInputChange('consentToShare', e.target.checked)}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                />
-                <div>
-                  <span className="text-sm font-medium text-gray-900">
-                    Do you give consent to share your business information with Standard Bank?
-                  </span>
-                  <p className="text-xs text-gray-600 mt-1">
-                    This helps us provide better financial services and opportunities for your business.
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4">Disclaimer and Declaration</h3>
-              
-              <div className="mb-4">
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.declaration}
-                    onChange={(e) => handleInputChange('declaration', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                    required
-                  />
-                  <div>
-                    <span className="text-sm font-medium text-gray-900">
-                      Declaration <span className="text-red-500">*</span>
-                    </span>
-                    <p className="text-xs text-gray-600 mt-1">
-                      I declare that the information provided is true and accurate to the best of my knowledge. 
-                      I understand that providing false information may result in the rejection of my application.
-                    </p>
-                  </div>
-                </label>
-              </div>
-              
-              <p className="text-sm text-gray-700 mb-4">
-                I hereby confirm that my business possesses all the following valid and up-to-date 
-                compliance documents. I understand that I must be able to submit these for 
-                verification if my application is shortlisted.
-              </p>
-              
-              <p className="text-sm font-medium text-gray-700 mb-4 italic">
-                Please tick the box next to each document you confirm is valid and up to date:
-              </p>
-
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-gray-900">
-                  Application Documents <span className="text-red-500">*</span>
-                </h4>
-                
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.cipcRegistrationDocument}
-                    onChange={(e) => handleInputChange('cipcRegistrationDocument', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                  />
-                  <span className="text-sm text-gray-700">CIPC Registration Document</span>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.validBBEECertificate}
-                    onChange={(e) => handleInputChange('validBBEECertificate', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                  />
-                  <span className="text-sm text-gray-700">Valid B-BBEE Certificate/Affidavit</span>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.proofOfID}
-                    onChange={(e) => handleInputChange('proofOfID', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                  />
-                  <span className="text-sm text-gray-700">Proof of ID</span>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.validTaxClearance}
-                    onChange={(e) => handleInputChange('validTaxClearance', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                  />
-                  <span className="text-sm text-gray-700">Valid Tax Clearance Certificate (Optional)</span>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.businessProfile}
-                    onChange={(e) => handleInputChange('businessProfile', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                  />
-                  <span className="text-sm text-gray-700">Business Profile (Optional)</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="pt-4">
+            {/* Navigation Buttons */}
+            <div className="flex justify-between pt-6">
               <button
-                type="submit"
-                className="w-full py-3 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 transition-colors"
+                type="button"
+                onClick={() => navigate('/welcome')}
+                className="px-6 py-3 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-950 transition-colors"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // Validate required fields for this page
+                  const requiredFields: (keyof FormDataState)[] = [
+                    'firstName', 'lastName', 'gender', 'emailAddress', 'cellphoneNumber', 
+                    'businessName', 'cipcRegistrationNo', 'businessResidentialCorridor',
+                    'bbbeeLevel', 'yearEstablished', 'annualTurnover', 'businessOverview', 'uniqueValueProposition'
+                  ];
+                  
+                  const missingFields = requiredFields.filter(field => {
+                    const value = formData[field];
+                    if (field === 'businessIndustry' || field === 'businessDescription') {
+                      return Array.isArray(value) ? value.length === 0 : !value;
+                    }
+                    return !value;
+                  });
+                  
+                  if (missingFields.length > 0) {
+                    alert('Please fill in all required fields marked with *');
+                    return;
+                  }
+
+                  if (formData.businessIndustry.length === 0) {
+                    alert('Please select at least one business industry');
+                    return;
+                  }
+
+                  if (formData.businessDescription.length === 0) {
+                    alert('Please select at least one option that describes your business');
+                    return;
+                  }
+
+                  if (formData.bbbeeLevel === 'Please Select' || !formData.bbbeeLevel) {
+                    alert('Please select a B-BBEE Level Contributor');
+                    return;
+                  }
+                  
+                  // Save current progress
+                  const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+                  localStorage.setItem('registrationData', JSON.stringify({
+                    ...existingData,
+                    step2: formData
+                  }));
+                  
+                  // Navigate to application type selection page
+                  navigate('/register/application-type');
+                }}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Next
               </button>
             </div>
-          </form>
+
+          </div>
 
           <div className="mt-4 text-center">
             <p className="text-xs text-gray-500">

@@ -31,6 +31,7 @@ import RegistrationStart from '../pages/registration/RegistrationStart';
 import BusinessInformation from '../pages/registration/BusinessInformation';
 import SupportingDocuments from '../pages/registration/SupportingDocuments';
 import ApplicationType from '../pages/registration/ApplicationType';
+import DisclaimerAndDeclaration from '../pages/registration/DisclaimerAndDeclaration';
 import Confirmation from '../pages/registration/Confirmation';
 
 // Error pages
@@ -83,6 +84,12 @@ export const publicRoutes: RouteConfig[] = [
   {
     path: '/register/application-type',
     element: ApplicationType,
+    isPublic: true,
+    layout: 'public'
+  },
+  {
+    path: '/register/disclaimer-declaration',
+    element: DisclaimerAndDeclaration,
     isPublic: true,
     layout: 'public'
   },

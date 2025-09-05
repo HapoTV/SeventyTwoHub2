@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search,
   Eye, 
@@ -15,6 +15,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { supabase, getBusinessRegistrations, updateRegistrationStatus } from '../../lib/supabase';
+import { sendStatusUpdateEmail } from '../../services/emailService';
 
 interface BusinessRegistration {
   id: string;
@@ -37,7 +38,13 @@ interface BusinessRegistration {
   reviewed_by?: string;
   review_notes?: string;
   reference_number: string;
-  documents?: any[];
+  documents?: {
+    id: string;
+    document_type: string;
+    file_url: string;
+    registration_id: string;
+    uploaded_at: string;
+  }[];
 }
 
 const BusinessRegistrationReview: React.FC = () => {
@@ -49,14 +56,34 @@ const BusinessRegistrationReview: React.FC = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewNotes, setReviewNotes] = useState('');
   const [loading, setLoading] = useState(true);
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
 
   useEffect(() => {
     loadRegistrations();
   }, []);
 
+  const filterRegistrations = useCallback(() => {
+    let filtered = [...registrations];
+
+    if (searchTerm) {
+      filtered = filtered.filter(reg =>
+        reg.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.reference_number.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(reg => reg.status === selectedStatus);
+    }
+
+    setFilteredRegistrations(filtered);
+  }, [registrations, searchTerm, selectedStatus]);
+
   useEffect(() => {
     filterRegistrations();
-  }, [registrations, searchTerm, selectedStatus]);
+  }, [filterRegistrations]);
 
   const loadRegistrations = async () => {
     try {
@@ -87,35 +114,39 @@ const BusinessRegistrationReview: React.FC = () => {
     }
   };
 
-  const filterRegistrations = () => {
-    let filtered = [...registrations];
-
-    if (searchTerm) {
-      filtered = filtered.filter(reg =>
-        reg.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.reference_number.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (selectedStatus !== 'all') {
-      filtered = filtered.filter(reg => reg.status === selectedStatus);
-    }
-
-    setFilteredRegistrations(filtered);
-  };
-
   const handleStatusUpdate = async (registrationId: string, status: string, notes?: string) => {
     try {
+      setSendingEmail(status);
+      
+      // Find the registration to get user details for email
+      const registration = registrations.find(reg => reg.id === registrationId);
+      if (!registration) {
+        throw new Error('Registration not found');
+      }
+
+      // Update status in database
       await updateRegistrationStatus(registrationId, status, notes);
+      
+      // Send email notification to user
+      const emailSent = await sendStatusUpdateEmail(registration, status, notes);
+      
+      if (emailSent) {
+        console.log('Status update email sent successfully');
+      } else {
+        console.warn('Failed to send status update email, but status was updated');
+      }
+
+      // Reload registrations and close modal
       await loadRegistrations();
       setShowReviewModal(false);
       setReviewNotes('');
-      alert('Registration status updated successfully!');
+      
+      alert(`Registration status updated successfully! ${emailSent ? 'Email notification sent to user.' : 'Note: Email notification failed to send.'}`);
     } catch (error) {
       console.error('Error updating registration status:', error);
       alert('Error updating registration status');
+    } finally {
+      setSendingEmail(null);
     }
   };
 
@@ -510,29 +541,51 @@ const BusinessRegistrationReview: React.FC = () => {
             <div className="flex space-x-3 mt-6 pt-4 border-t border-gray-200">
               <button
                 onClick={() => handleStatusUpdate(selectedRegistration.id, 'approved', reviewNotes)}
-                className="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-1"
+                disabled={sendingEmail !== null}
+                className="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <CheckCircle className="w-4 h-4" />
-                <span>Approve</span>
+                {sendingEmail === 'approved' ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Approve</span>
+                  </>
+                )}
               </button>
               <button
                 onClick={() => handleStatusUpdate(selectedRegistration.id, 'under_review', reviewNotes)}
-                className="flex-1 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                disabled={sendingEmail !== null}
+                className="flex-1 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Under Review
+                {sendingEmail === 'under_review' ? 'Sending...' : 'Under Review'}
               </button>
               <button
                 onClick={() => handleStatusUpdate(selectedRegistration.id, 'requires_documents', reviewNotes)}
-                className="flex-1 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                disabled={sendingEmail !== null}
+                className="flex-1 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Need Docs
+                {sendingEmail === 'requires_documents' ? 'Sending...' : 'Need Docs'}
               </button>
               <button
                 onClick={() => handleStatusUpdate(selectedRegistration.id, 'rejected', reviewNotes || 'Application rejected')}
-                className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-1"
+                disabled={sendingEmail !== null}
+                className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <XCircle className="w-4 h-4" />
-                <span>Reject</span>
+                {sendingEmail === 'rejected' ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4" />
+                    <span>Reject</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

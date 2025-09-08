@@ -110,13 +110,18 @@ const BusinessRegistrationReview: React.FC = () => {
         })
       );
       
-      // Sort registrations: those with recent document uploads first, then by submission date
+      // Sort registrations: most recent admin actions first, then document uploads, then submission date
       const sortedRegistrations = registrationsWithDocs.sort((a, b) => {
-        // First priority: registrations with documents uploaded
+        // First priority: most recent admin action (reviewed_at)
+        if (a.reviewed_at && !b.reviewed_at) return -1;
+        if (!a.reviewed_at && b.reviewed_at) return 1;
+        if (a.reviewed_at && b.reviewed_at) {
+          return new Date(b.reviewed_at).getTime() - new Date(a.reviewed_at).getTime();
+        }
+        
+        // Second priority: registrations with recent document uploads
         if (a.latest_document_upload && !b.latest_document_upload) return -1;
         if (!a.latest_document_upload && b.latest_document_upload) return 1;
-        
-        // Second priority: most recent document upload
         if (a.latest_document_upload && b.latest_document_upload) {
           return new Date(b.latest_document_upload).getTime() - new Date(a.latest_document_upload).getTime();
         }

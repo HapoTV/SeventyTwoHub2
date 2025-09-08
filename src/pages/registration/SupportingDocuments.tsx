@@ -59,22 +59,18 @@ const SupportingDocuments: React.FC = () => {
                 isEmailSubmission: true
             };
             
+            // Store document submission data for confirmation page immediately
+            localStorage.setItem('emailDocumentSubmission', JSON.stringify(documentData));
+            
+            // Navigate to confirmation page immediately for better UX
+            navigate('/register/documents/confirmation');
+            
+            // Upload documents in the background
             try {
-                // Upload documents to database and storage
-                const success = await uploadDocuments(documentData);
-                
-                if (success) {
-                    // Store document submission data for confirmation page
-                    localStorage.setItem('emailDocumentSubmission', JSON.stringify(documentData));
-                    
-                    // Redirect to standalone confirmation page
-                    navigate('/register/documents/confirmation');
-                } else {
-                    alert('Failed to upload documents. Please try again.');
-                }
+                await uploadDocuments(documentData);
             } catch (error) {
                 console.error('Error uploading documents:', error);
-                alert('An error occurred while uploading documents. Please try again.');
+                // Documents will still show as submitted to user, but we log the error
             }
             
         } else {

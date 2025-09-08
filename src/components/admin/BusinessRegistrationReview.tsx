@@ -41,6 +41,7 @@ interface BusinessRegistration {
   documents?: {
     id: string;
     document_type: string;
+    file_name: string;
     file_url: string;
     registration_id: string;
     uploaded_at: string;
@@ -57,6 +58,7 @@ const BusinessRegistrationReview: React.FC = () => {
   const [reviewNotes, setReviewNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+  const [viewingDocument, setViewingDocument] = useState<{url: string, type: string, name: string} | null>(null);
 
   useEffect(() => {
     loadRegistrations();
@@ -97,16 +99,33 @@ const BusinessRegistrationReview: React.FC = () => {
           const { data: documents } = await supabase
             .from('registration_documents')
             .select('*')
-            .eq('registration_id', registration.id);
+            .eq('registration_id', registration.id)
+            .order('uploaded_at', { ascending: false });
           
           return {
             ...registration,
-            documents: documents || []
+            documents: documents || [],
+            latest_document_upload: documents && documents.length > 0 ? documents[0].uploaded_at : null
           };
         })
       );
       
-      setRegistrations(registrationsWithDocs);
+      // Sort registrations: those with recent document uploads first, then by submission date
+      const sortedRegistrations = registrationsWithDocs.sort((a, b) => {
+        // First priority: registrations with documents uploaded
+        if (a.latest_document_upload && !b.latest_document_upload) return -1;
+        if (!a.latest_document_upload && b.latest_document_upload) return 1;
+        
+        // Second priority: most recent document upload
+        if (a.latest_document_upload && b.latest_document_upload) {
+          return new Date(b.latest_document_upload).getTime() - new Date(a.latest_document_upload).getTime();
+        }
+        
+        // Third priority: most recent submission date
+        return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
+      });
+      
+      setRegistrations(sortedRegistrations);
     } catch (error) {
       console.error('Error loading registrations:', error);
     } finally {
@@ -488,7 +507,11 @@ const BusinessRegistrationReview: React.FC = () => {
                             <span className="text-sm text-gray-900">{doc.document_type}</span>
                           </div>
                           <button
-                            onClick={() => window.open(doc.file_url, '_blank')}
+                            onClick={() => setViewingDocument({
+                              url: doc.file_url,
+                              type: doc.document_type,
+                              name: doc.file_name || doc.document_type
+                            })}
                             className="text-primary-600 hover:text-primary-700 text-sm"
                           >
                             View
@@ -587,6 +610,51 @@ const BusinessRegistrationReview: React.FC = () => {
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Document Viewer Modal */}
+      {viewingDocument && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{viewingDocument.type}</h3>
+                <p className="text-sm text-gray-600">{viewingDocument.name}</p>
+              </div>
+              <button
+                onClick={() => setViewingDocument(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Document Content */}
+            <div className="flex-1 p-4 overflow-auto">
+              {viewingDocument.url.toLowerCase().includes('.pdf') ? (
+                <iframe
+                  src={`${viewingDocument.url}#toolbar=0&navpanes=0&scrollbar=0`}
+                  className="w-full h-full min-h-[600px] border-0"
+                  title={viewingDocument.name}
+                  style={{ pointerEvents: 'auto' }}
+                />
+              ) : (
+                <div className="flex justify-center">
+                  <img
+                    src={viewingDocument.url}
+                    alt={viewingDocument.name}
+                    className="max-w-full max-h-full object-contain select-none"
+                    onContextMenu={(e) => e.preventDefault()}
+                    draggable={false}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

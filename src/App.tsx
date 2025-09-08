@@ -39,6 +39,8 @@ const ProgramManagement = React.lazy(() => import("./pages/admin/ProgramManageme
 const PublicApplicationForm = React.lazy(() => import("./pages/PublicApplicationForm"));
 const CreateAccountWithValidation = React.lazy(() => import("./pages/registration/CreateAccountWithValidation"));
 const BusinessInformation = React.lazy(() => import("./pages/registration/BusinessInformation"));
+const SupportingDocuments = React.lazy(() => import("./pages/registration/SupportingDocuments"));
+const DocumentSubmissionConfirmation = React.lazy(() => import("./pages/registration/DocumentSubmissionConfirmation"));
 const ApplicationType = React.lazy(() => import("./pages/registration/ApplicationType"));
 const DisclaimerAndDeclaration = React.lazy(() => import("./pages/registration/DisclaimerAndDeclaration"));
 const Confirmation = React.lazy(() => import("./pages/registration/Confirmation"));
@@ -114,6 +116,8 @@ function App() {
                 <Route path="/apply/:linkId" element={<PublicApplicationForm />} />
                 <Route path="/register/account-validated" element={<CreateAccountWithValidation />} />
                 <Route path="/register/business" element={<BusinessInformation />} />
+                <Route path="/register/documents" element={<SupportingDocuments />} />
+                <Route path="/register/documents/confirmation" element={<DocumentSubmissionConfirmation />} />
                 <Route path="/register/application-type" element={<ApplicationType />} />
                 <Route path="/register/disclaimer-declaration" element={<DisclaimerAndDeclaration />} />
                 <Route path="/register/confirmation" element={<Confirmation />} />

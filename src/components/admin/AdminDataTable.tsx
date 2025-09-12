@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Eye, Edit, Trash2 } from 'lucide-react';
 
+interface DataRow {
+  id: string;
+  [key: string]: unknown;
+}
+
 interface Column {
   key: string;
   label: string;
   sortable?: boolean;
-  render?: (value: any, row: any) => React.ReactNode;
+  render?: (value: unknown, row: DataRow) => React.ReactNode;
   width?: string;
 }
 
 interface AdminDataTableProps {
-  data: any[];
+  data: DataRow[];
   columns: Column[];
-  onRowClick?: (row: any) => void;
-  onEdit?: (row: any) => void;
-  onDelete?: (row: any) => void;
-  onView?: (row: any) => void;
+  onRowClick?: (row: DataRow) => void;
+  onEdit?: (row: DataRow) => void;
+  onDelete?: (row: DataRow) => void;
+  onView?: (row: DataRow) => void;
   selectable?: boolean;
   selectedRows?: string[];
   onSelectionChange?: (selectedIds: string[]) => void;
@@ -178,7 +183,7 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({
                 
                 {columns.map(column => (
                   <td key={column.key} className="px-4 py-4 text-sm">
-                    {column.render ? column.render(row[column.key], row) : row[column.key]}
+                    {column.render ? column.render(row[column.key], row) : String(row[column.key] ?? '')}
                   </td>
                 ))}
                 

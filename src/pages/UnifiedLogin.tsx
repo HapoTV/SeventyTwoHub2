@@ -362,28 +362,28 @@ const UnifiedLogin: React.FC = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div className="relative z-10 flex items-center min-h-[calc(100vh-80px)] px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 items-center w-full">
-          
-          {/* Left side - Unified SSO Form */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-8 border border-white/20 shadow-2xl max-w-md w-full">
-            {/* Logo and Title */}
-            <div className="text-center mb-8">
-              <div className="flex flex-col items-center justify-center mb-4">
-                <img
-                    src={logo}
-                    alt="Standard Bank Logo"
-                    className="h-10 w-auto mb-2"
-                />
-                <span className="text-xl font-bold text-gray-900">
-      Standard Bank Program Login
-    </span>
-              </div>
-              <h1 className="text-xl font-semibold text-gray-900 mb-2">
+    {/* Main Content */}
+    <div className="relative z-10 flex items-start pt-2 min-h-[calc(100vh-80px)] px-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 items-center w-full">
+        
+        {/* Left side - Unified SSO Form */}
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-white/20 shadow-2xl max-w-[370px] w-full lg:ml-auto lg:mr-8 min-h-[580px]">
+          {/* Logo and Title */}
+          <div className="text-center mb-3">
+            <div className="flex flex-col items-center justify-center mb-2">
+              <img
+                  src={logo}
+                  alt="Standard Bank Logo"
+                  className="h-6 w-auto mb-1"
+              />
+              <span className="text-sm font-bold text-gray-900">
+                Standard Bank Program Login
+              </span>
+            </div>
+              <h1 className="text-sm font-semibold text-gray-900 mb-1">
                 {formMode === 'login' ? 'Secure Sign In' : 'Create Account'}
               </h1>
-              <p className="text-gray-600">Unified Access Portal</p>
+              <p className="text-xs text-gray-600">Unified Access Portal</p>
             </div>
 
 
@@ -410,11 +410,11 @@ const UnifiedLogin: React.FC = () => {
             )}
 
             {/* Unified Form */}
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <form onSubmit={handleSubmit} className="space-y-1.5" noValidate>
               {formMode === 'signup' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Full Name</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
@@ -422,7 +422,7 @@ const UnifiedLogin: React.FC = () => {
                         value={formData.fullName}
                         onChange={(e) => handleInputChange('fullName', e.target.value)}
                         placeholder="Enter your full name"
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                        className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                           errors.fullName ? 'border-red-300 bg-red-50' : 'border-gray-300'
                         }`}
                         required
@@ -435,7 +435,7 @@ const UnifiedLogin: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number (Optional)</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Mobile Number (Optional)</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
@@ -443,7 +443,7 @@ const UnifiedLogin: React.FC = () => {
                         value={formData.mobileNumber}
                         onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
                         placeholder="+27 XX XXX XXXX"
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                        className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                           errors.mobileNumber ? 'border-red-300 bg-red-50' : 'border-gray-300'
                         }`}
                         autoComplete="tel"
@@ -457,7 +457,7 @@ const UnifiedLogin: React.FC = () => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -465,7 +465,7 @@ const UnifiedLogin: React.FC = () => {
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="Enter your email address"
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                       errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
                     }`}
                     autoComplete="username"
@@ -478,7 +478,7 @@ const UnifiedLogin: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -486,7 +486,7 @@ const UnifiedLogin: React.FC = () => {
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     placeholder="Enter your password"
-                    className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                       errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                     }`}
                     autoComplete={formMode === 'login' ? 'current-password' : 'new-password'}
@@ -507,7 +507,7 @@ const UnifiedLogin: React.FC = () => {
 
               {formMode === 'signup' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Confirm Password</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -515,7 +515,7 @@ const UnifiedLogin: React.FC = () => {
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                       placeholder="Confirm your password"
-                      className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                         errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                       autoComplete="new-password"
@@ -559,7 +559,7 @@ const UnifiedLogin: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || authLoading || isRateLimited}
-                className={`w-full py-3 rounded-lg font-bold transition-colors flex items-center justify-center ${
+                className={`w-full py-2 rounded-lg font-bold transition-colors flex items-center justify-center ${
                   isLoading || authLoading || isRateLimited
                     ? 'bg-gray-400 text-white cursor-not-allowed'
                     : 'bg-primary-500 text-white hover:bg-primary-600'
@@ -596,21 +596,7 @@ const UnifiedLogin: React.FC = () => {
 
             {/* Toggle Link */}
             <div className="text-center mt-6">
-              {formMode === 'login' ? (
-                <p className="text-gray-600">
-                  Don't have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormMode('signup');
-                      resetForm();
-                    }}
-                    className="text-primary-600 hover:text-primary-700 font-medium"
-                  >
-                    Create account
-                  </button>
-                </p>
-              ) : (
+              {formMode === 'signup' && (
                 <p className="text-gray-600">
                   Already have an account?{' '}
                   <button

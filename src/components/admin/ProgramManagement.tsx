@@ -103,11 +103,12 @@ const ProgramManagement: React.FC = () => {
       const data = await getProgramsWithCounts();
       // **FIX 5: Removed unsafe `as any` cast. Trust the type from the library function.**
       setPrograms(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading programs:', error);
-      if (error?.code === '42501') {
+      const err = error as { code?: string; message?: string };
+      if (err?.code === '42501') {
         setError('You do not have permission to view programs. Please ensure you have admin privileges.');
-      } else if (error?.code === '42703') {
+      } else if (err?.code === '42703') {
         setError('Database schema error. Please contact support.');
       } else {
         setError('Failed to load programs. Please try again.');
@@ -148,11 +149,12 @@ const ProgramManagement: React.FC = () => {
       await loadPrograms();
       setShowCreateModal(false);
       alert('Program created successfully!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating program:', error);
-      if (error?.code === '42501') {
+      const err = error as { code?: string; message?: string };
+      if (err?.code === '42501') {
         alert('You do not have permission to create programs. Please ensure you have admin privileges.');
-      } else if (error?.message?.includes('invalid input syntax for type uuid')) {
+      } else if (err?.message?.includes('invalid input syntax for type uuid')) {
         alert('Invalid user ID format. Please contact support.');
       } else if (error instanceof Error) {
         alert(`Error creating program: ${error.message}`);

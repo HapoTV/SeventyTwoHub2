@@ -7,11 +7,7 @@ import {
   Users,
   FileText,
   BarChart3,
-  Home,
-  Bell,
-  Database,
-  Lock,
-  Globe
+  Home
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { UserCog } from 'lucide-react';
@@ -42,23 +38,26 @@ const AdminLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
     { id: 'programs', path: '/admin/programs', icon: FileText, label: 'Programs' },
     { id: 'registrations', path: '/admin/dashboard/registrations', icon: Shield, label: 'Registrations' },
     { id: 'analytics', path: '/admin/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
-    { id: 'general', path: '/admin/dashboard/general', icon: Settings, label: 'General' },
-    { id: 'security', path: '/admin/dashboard/security', icon: Lock, label: 'Security' },
-    { id: 'notifications', path: '/admin/dashboard/notifications', icon: Bell, label: 'Notifications' },
-    { id: 'integrations', path: '/admin/dashboard/integrations', icon: Database, label: 'Integrations' },
-    { id: 'access-control', path: '/admin/dashboard/access-control', icon: Globe, label: 'Access Control' },
+    { id: 'settings', path: '/admin/dashboard/settings', icon: Settings, label: 'Settings' },
   ];
 
   const handleNavigation = (item: any) => {
     if (item.path === '/admin/programs') {
       navigate('/admin/programs');
+      setActiveTab('programs');
     } else {
+      // Always navigate to dashboard first, then set the tab
       navigate('/admin/dashboard');
       setActiveTab(item.id);
-      // Notify AdminDashboard component about tab change
+      
+      // Immediately set the tab without delay for smooth navigation
       if ((window as any).setAdminTab) {
         (window as any).setAdminTab(item.id);
       }
+      // Dispatch a custom event to ensure tab change is handled
+      window.dispatchEvent(new CustomEvent('adminTabChange', { 
+        detail: { tab: item.id } 
+      }));
     }
   };
 

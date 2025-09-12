@@ -110,24 +110,29 @@ const BusinessRegistrationReview: React.FC = () => {
         })
       );
       
-      // Sort registrations: most recent admin actions first, then document uploads, then submission date
+      // Sort registrations: most recent submissions first (prioritize new applications)
       const sortedRegistrations = registrationsWithDocs.sort((a, b) => {
-        // First priority: most recent admin action (reviewed_at)
-        if (a.reviewed_at && !b.reviewed_at) return -1;
-        if (!a.reviewed_at && b.reviewed_at) return 1;
-        if (a.reviewed_at && b.reviewed_at) {
-          return new Date(b.reviewed_at).getTime() - new Date(a.reviewed_at).getTime();
+        // Primary sort: most recent submission date (newest first)
+        const submissionDiff = new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
+        
+        // If submissions are on the same day, then prioritize by admin actions
+        if (Math.abs(submissionDiff) < 24 * 60 * 60 * 1000) { // Within 24 hours
+          // Prioritize recent admin actions
+          if (a.reviewed_at && !b.reviewed_at) return -1;
+          if (!a.reviewed_at && b.reviewed_at) return 1;
+          if (a.reviewed_at && b.reviewed_at) {
+            return new Date(b.reviewed_at).getTime() - new Date(a.reviewed_at).getTime();
+          }
+          
+          // Then by document uploads
+          if (a.latest_document_upload && !b.latest_document_upload) return -1;
+          if (!a.latest_document_upload && b.latest_document_upload) return 1;
+          if (a.latest_document_upload && b.latest_document_upload) {
+            return new Date(b.latest_document_upload).getTime() - new Date(a.latest_document_upload).getTime();
+          }
         }
         
-        // Second priority: registrations with recent document uploads
-        if (a.latest_document_upload && !b.latest_document_upload) return -1;
-        if (!a.latest_document_upload && b.latest_document_upload) return 1;
-        if (a.latest_document_upload && b.latest_document_upload) {
-          return new Date(b.latest_document_upload).getTime() - new Date(a.latest_document_upload).getTime();
-        }
-        
-        // Third priority: most recent submission date
-        return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime();
+        return submissionDiff;
       });
       
       setRegistrations(sortedRegistrations);

@@ -366,7 +366,7 @@ const createNeedDocumentsEmailTemplate = (registration: RegistrationData, adminN
             <p>Please upload the requested documents as soon as possible to avoid delays in processing your application.</p>
           </div>
           
-          <a href="${process.env.NODE_ENV === 'production' ? 'https://seventytwohub.netlify.app' : 'http://localhost:5173'}/register/documents?ref=${registration.reference_number}&email=${encodeURIComponent(registration.email)}" class="button">Upload Documents</a>
+          <a href="${window.location.origin}/register/documents?ref=${registration.reference_number}&email=${encodeURIComponent(registration.email)}" class="button">Upload Documents</a>
           
           <p><strong>Important:</strong> Please ensure all documents are clear, legible, and in PDF or image format (JPG, PNG).</p>
           
